@@ -1,9 +1,12 @@
 import React, { useState, useRef } from "react";
+import {useNavigate} from 'react-router-dom'
+
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate()
 
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -49,14 +52,20 @@ const AuthForm = () => {
           "Content-Type": "application/json",
         },
       });
+
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error.message);
       }
       const data = await response.json();
       console.log(data);
-      console.log("User log in sucessfully");
-
+      if(isLogin){
+          navigate("/home")
+          return;
+      }
+      setIsLogin(true);
+      passwordInputRef.current.value = "";
+      emailInputRef.current.value= "";
       setIsLoading(true);
     } catch (error) {
       alert(error);

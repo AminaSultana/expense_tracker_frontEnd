@@ -1,10 +1,15 @@
-import './App.css';
-import AuthForm from './Component/Auth/AuthForm';
+import { Route, Routes } from "react-router-dom";
+import AuthForm from "./Component/Auth/AuthForm";
+import HomePage from "./Pages/HomePage";
 
 function App() {
   return (
     <>
-    <AuthForm/>
+      
+      <Routes>
+        <Route path="/" element={<AuthForm />}/>
+        <Route path="/home" element={<HomePage />} />
+      </Routes>
     </>
   );
 }
