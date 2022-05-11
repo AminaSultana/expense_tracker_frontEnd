@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
+import AuthContext from "./auth-context";
 
 import CartContext from "./cart-context";
 
@@ -7,9 +8,18 @@ const CartContextProvider = (props) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
 
+  const authCtx = useContext(AuthContext);
+
+    let newEmailString, email;
+    if (authCtx.isLoggedIn) {
+      newEmailString = localStorage.getItem("email")
+      email = newEmailString.replace(/[@.]/gi, "");
+    }
+
+
   const getExpenseFromDB = async()=>{
       try {
-        const response = await fetch(`https://crudcrud.com/api/7ded2d121b9d4330986c543b4c19793e/cart`)
+        const response = await fetch(`https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email}.json`)
         const data = await response.json();
         const cartItem = [];
         let amount = 0;
@@ -33,8 +43,9 @@ const CartContextProvider = (props) => {
   }, []);
 
   const addItemToCartHandler = async (item) => {
+
       try {
-        const response = await fetch(`https://crudcrud.com/api/7ded2d121b9d4330986c543b4c19793e/cart`,{
+        const response = await fetch(`https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email}.json`,{
             method:"POST",
             body: JSON.stringify(item),
             headers: {
