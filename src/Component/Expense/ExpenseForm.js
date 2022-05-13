@@ -1,24 +1,87 @@
-import React, { useContext, useRef } from "react";
-import CartContext from "../../store/cart-context";
-
+import React, { useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { expenseActions } from "../../store/expense";
 import classes from "./ExpenseForm.module.css";
 
 const ExpenseForm = () => {
-  const cartCtx = useContext(CartContext);
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const amountRef = useRef();
   const descriptionRef = useRef();
   const categoryRef = useRef();
 
-  const expenseSubmitHandler = async (event) => {
+  let newEmailString, email1;
+  if (isLoggedIn) {
+    newEmailString = localStorage.getItem("email");
+    email1 = newEmailString.replace(/[@.]/gi, "");
+  }
+
+  const getExpenseFromDB = async () => {
+    try {
+      const response = await fetch(
+        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email1}.json`
+      );
+      if (!response.ok) {
+        throw new Error("Could not fetch data.");
+      }
+      const expense = await response.json();
+      console.log("expensse", expense);
+      let data = [];
+      let amount=0;
+      for (const key in expense) {
+        amount+=Number(expense[key].amount)
+        data.push({
+          amount: expense[key].amount,
+          description: expense[key].description,
+          category: expense[key].category,
+        });
+      }
+      const expenseData={
+        data:data,
+        amount:amount
+      }
+      dispatch(expenseActions.addItems(expenseData));
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  useEffect(() => {
+    getExpenseFromDB();
+  }, []);
+
+  const addExpenseToDB = async (expense) => {
+    try {
+      const response = await fetch(
+        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email1}.json`,
+        {
+          method: "POST",
+          body: JSON.stringify(expense),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Could not add expense.Something went wrong");
+      }
+      toast.success("Expense added successfully");
+      getExpenseFromDB();
+    } catch (error) {
+      toast(error);
+    }
+  };
+
+  const expenseSubmitHandler = (event) => {
     event.preventDefault();
     const expense = {
       amount: amountRef.current.value,
       description: descriptionRef.current.value,
       category: categoryRef.current.value,
     };
-    cartCtx.addItems(expense);
-
-    console.log(categoryRef.current.value);
+    addExpenseToDB(expense);
   };
 
   return (
@@ -35,8 +98,8 @@ const ExpenseForm = () => {
         <div className={classes.category}>
           <label>Category</label>
           <select ref={categoryRef}>
-            <option value="food">Food</option>
             <option value="travelling">Travelling</option>
+            <option value="food">Food</option>
             <option value="birthday">Birthday</option>
             <option value="shopping">Shopping</option>
             <option value="grocery">Grocery</option>

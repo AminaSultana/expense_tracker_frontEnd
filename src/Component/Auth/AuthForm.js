@@ -1,11 +1,16 @@
-import React, { useState, useRef } from "react";
-import {useNavigate} from 'react-router-dom'
+import React, { useState, useRef, useContext } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 
+import AuthContext from "../../store/auth-context";
 import classes from "./AuthForm.module.css";
+import { authActions } from "../../store/auth";
 
 const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const dispatch = useDispatch();
+
   const navigate = useNavigate()
 
   const emailInputRef = useRef();
@@ -18,7 +23,6 @@ const AuthForm = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log("clicked");
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     let enteredConfirmPassword;
@@ -27,7 +31,7 @@ const AuthForm = () => {
       if (enteredPassword !== enteredConfirmPassword) {
         alert("Password did not match");
         passwordInputRef.current.value = "";
-        confirmPasswordInputRef.current.value = ""; 
+        confirmPasswordInputRef.current.value = "";
         return;
       }
     }
@@ -58,20 +62,23 @@ const AuthForm = () => {
         throw new Error(data.error.message);
       }
       const data = await response.json();
-      console.log(data);
-      if(isLogin){
-          navigate("/home")
-          return;
+      if (isLogin) {
+        dispatch(authActions.login(data.idToken))
+        localStorage.setItem("token", data.idToken);
+        localStorage.setItem("email", enteredEmail)
+        navigate("/home");
+        return;
       }
       setIsLogin(true);
       passwordInputRef.current.value = "";
-      emailInputRef.current.value= "";
+      emailInputRef.current.value = "";
       setIsLoading(true);
     } catch (error) {
       alert(error);
     }
     setIsLoading(false);
   };
+
 
   let content = <p>Create New User</p>;
   if (isLoading) {
@@ -107,12 +114,13 @@ const AuthForm = () => {
         )}
         <div className={classes.actions}>
           <button type="submit">{isLogin ? "Login" : content}</button>
+          {isLogin && <Link to={'/password-reset'}>Forgot password?</Link>}
           <button
             type="button"
             className={classes.toggle}
             onClick={switchAuthModeHandler}
           >
-            {isLogin ? "Create new account" : "Login with existing account"}
+            {isLogin ? "New user? Sign Up" : "Login with existing account"}
           </button>
         </div>
       </form>
