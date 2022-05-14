@@ -36,6 +36,7 @@ const ExpenseForm = () => {
           category: expense[key].category,
         });
       }
+      
       const expenseData={
         data:data,
         amount:amount
