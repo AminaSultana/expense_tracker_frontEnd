@@ -1,7 +1,5 @@
 import React, { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { expenseActions } from "../../store/expense";
 import classes from "./ExpenseForm.module.css";
 
@@ -67,10 +65,10 @@ const ExpenseForm = () => {
       if (!response.ok) {
         throw new Error("Could not add expense.Something went wrong");
       }
-      toast.success("Expense added successfully");
+      console.log("Expense added successfully");
       getExpenseFromDB();
     } catch (error) {
-      toast(error);
+      console.log(error);
     }
   };
 
