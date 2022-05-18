@@ -5,38 +5,32 @@ import classes from "./ExpenseForm.module.css";
 
 const ExpenseForm = () => {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const email = useSelector((state)=>state.auth.userEmail)
   const amountRef = useRef();
   const descriptionRef = useRef();
   const categoryRef = useRef();
-
-  let newEmailString, email1;
-  if (isLoggedIn) {
-    newEmailString = localStorage.getItem("email");
-    email1 = newEmailString.replace(/[@.]/gi, "");
-  }
-
+  
   const getExpenseFromDB = async () => {
     try {
       const response = await fetch(
-        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email1}.json`
+        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email}.json`
       );
       if (!response.ok) {
         throw new Error("Could not fetch data.");
       }
       const expense = await response.json();
-      console.log("expensse", expense);
       let data = [];
       let amount=0;
       for (const key in expense) {
         amount+=Number(expense[key].amount)
         data.push({
+          id:key,
           amount: expense[key].amount,
           description: expense[key].description,
           category: expense[key].category,
         });
       }
-      
+
       const expenseData={
         data:data,
         amount:amount
@@ -54,7 +48,7 @@ const ExpenseForm = () => {
   const addExpenseToDB = async (expense) => {
     try {
       const response = await fetch(
-        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email1}.json`,
+        `https://expense-tracker-a5dab-default-rtdb.firebaseio.com/${email}.json`,
         {
           method: "POST",
           body: JSON.stringify(expense),
