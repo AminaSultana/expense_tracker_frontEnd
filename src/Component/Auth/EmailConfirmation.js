@@ -32,6 +32,7 @@ const EmailConfirmation = () => {
     verifyEmailHandler()
     const proceedHandler=(e)=>{
         e.preventDefault()
+        console.log("");
         navigate("/")
     }
 

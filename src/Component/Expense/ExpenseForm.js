@@ -20,6 +20,7 @@ const ExpenseForm = () => {
       }
       const expense = await response.json();
       let data = [];
+      console.log("");
       let amount=0;
       for (const key in expense) {
         amount+=Number(expense[key].amount)

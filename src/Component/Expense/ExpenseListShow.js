@@ -27,7 +27,6 @@ const ExpenseListShow = (props) => {
 
   const editExpenseHandler = async (e) => {
     e.preventDefault();
-    
   };
 
   return (

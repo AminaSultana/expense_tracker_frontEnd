@@ -2,15 +2,14 @@ import React, { useState, useRef, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-import AuthContext from "../../store/auth-context";
 import classes from "./AuthForm.module.css";
 import { authActions } from "../../store/auth";
 
 const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const navigate = useNavigate()
 
   const emailInputRef = useRef();
@@ -23,9 +22,11 @@ const AuthForm = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
+
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     let enteredConfirmPassword;
+
     if (!isLogin) {
       enteredConfirmPassword = confirmPasswordInputRef.current.value;
       if (enteredPassword !== enteredConfirmPassword) {
@@ -44,6 +45,7 @@ const AuthForm = () => {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCJxA_K5UfddM0iHg_NzvLXksyPx1KWeV4";
     }
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -56,16 +58,19 @@ const AuthForm = () => {
           "Content-Type": "application/json",
         },
       });
-
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error.message);
       }
-      const data = await response.json();
+      if(!isLogin){
+        navigate(`/emailconfirmation?token=${data.idToken}`)
+      }
+
       if (isLogin) {
         dispatch(authActions.login(data.idToken))
         localStorage.setItem("token", data.idToken);
-        localStorage.setItem("email", enteredEmail)
+        let newEmailString = enteredEmail.replace(/[@.]/gi, "");
+        localStorage.setItem("email", newEmailString)
         navigate("/home");
         return;
       }

@@ -7,6 +7,7 @@ import AuthForm from "./Component/Auth/AuthForm";
 import PasswordReset from "./Component/Auth/PasswordReset";
 import Expense from "./Component/Expense/Expense";
 import HomePage from "./Pages/HomePage";
+import EmailConfirmation from "./Component/Auth/EmailConfirmation";
 
 function App() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -36,13 +37,14 @@ function App() {
     headers: headers,
     data: expenses
   }
-
+  
   return (
     <>
       <Routes>
-        <Route path="/" element={<AuthForm />} />
+        <Route path="/" element={!isLoggedIn && <AuthForm />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/password-reset" element={<PasswordReset />} />
+        <Route path="/emailconfirmation" element={<EmailConfirmation/>}/>
       </Routes>
       {activatePremium && 
       <div id="darkmode">
@@ -56,7 +58,6 @@ function App() {
         <CSVLink {...csvExpense}>Download File</CSVLink>        
       </div>
 }
-      {isLoggedIn && <Expense />}
     </>
   );
 }

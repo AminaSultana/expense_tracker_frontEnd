@@ -31,6 +31,7 @@ const PasswordReset = () => {
       alert(error.message);
     }
     setIsloading(false);
+    console.log("");
   };
   return (
     <>

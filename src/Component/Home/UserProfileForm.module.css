@@ -1,0 +1,21 @@
+.profile_main{
+    float: right;
+    width: fit-content;
+    border-bottom: 2px solid rgb(156, 140, 140);
+    padding: 15px;
+    margin-right: 2rem;
+
+}
+
+.form span{
+    padding: 10px;
+}
+.form_btn{
+    margin: 10px;
+    background-color: rgb(137, 83, 83);
+    cursor: pointer;
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    
+}
